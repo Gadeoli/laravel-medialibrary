@@ -153,4 +153,11 @@ return [
         'perform_conversions' => Spatie\MediaLibrary\Jobs\PerformConversions::class,
         'generate_responsive_images' => Spatie\MediaLibrary\Jobs\GenerateResponsiveImages::class,
     ],
+
+    /**
+     * Custom
+     */
+    'permissions' => [
+        'group'=> env('MEDIALIBRARY_GROUP', 'www-data'),
+    ],
 ];

@@ -19,9 +19,12 @@ class Filesystem
     /** @var array */
     protected $customRemoteHeaders = [];
 
+    private $group = '';
+
     public function __construct(Factory $filesystem)
     {
         $this->filesystem = $filesystem;
+        $this->group = config('medialibrary.permissions.group');
     }
 
     public function add(string $file, Media $media, ?string $targetFileName = null)
@@ -40,6 +43,22 @@ class Filesystem
         $destination = $this->getMediaDirectory($media, $type).$destinationFileName;
 
         $file = fopen($pathToFile, 'r');
+    
+        //Added to preserve ubuntu group 
+        //Added to work with queue
+        if($this->group){
+            $realMediaPath = 
+            $this->filesystem
+            ->disk($media->disk)
+            ->getDriver()
+            ->getAdapter()
+            ->getPathPrefix().
+            $this->
+            getMediaDirectory($media, $type);
+            
+            chmod($realMediaPath, 0775);
+            chgrp($realMediaPath, $this->group);
+        }
 
         if ($media->getDiskDriverName() === 'local') {
             $this->filesystem
@@ -49,7 +68,7 @@ class Filesystem
             fclose($file);
 
             return;
-        }
+        }    
 
         $this->filesystem
             ->disk($media->disk)
